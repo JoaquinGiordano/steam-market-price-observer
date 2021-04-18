@@ -1,65 +1,34 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head"
+import AddItemPanel from "../components/AddItemPanel"
+
+import Image from "next/image"
+
+import ItemsContainer from "../components/ItemsContainer"
 
 export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    return (
+        <div className="flex flex-col bg-page h-full min-h-screen w-full">
+            <Head>
+                <title>Steam Market Price Observer</title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            <div className=" flex items-center p-5 h-28">
+                <div className="flex items-center justify-center md:justify-start shadow w-full md:w-auto  gap-5 bg-white py-2 pl-2 pr-5 rounded md:rounded-full">
+                    <Image width={64} height={64} src="/assets/logo.png" />
+                    <h1 className="text-gray-800 text-2xl md:text-3xl text-center font-semibold">
+                        Steam Market Price Observer
+                    </h1>
+                </div>
+            </div>
+            <div className="flex flex-col md:flex-row h-full w-full">
+                <div className=" p-5 w-full xl:w-1/3 md:w-1/2">
+                    <AddItemPanel />
+                </div>
+                <div className=" p-5 w-full xl:w-2/3 md:w-1/2">
+                    <ItemsContainer />
+                </div>
+            </div>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+    )
 }
