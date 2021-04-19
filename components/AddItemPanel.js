@@ -1,104 +1,75 @@
 import Textbox from "./Textbox"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { ItemsContext } from "../contexts/Items.context"
 
 const AddItemPanel = () => {
     const { items, setItems } = useContext(ItemsContext)
 
+    const [isAddingItem, setIsAddingItem] = useState(false)
+
     const AddItem = () => {
-        let item_steam_url = document.querySelector("#steam_url_input").value
-        if (
-            item_steam_url.search(
-                /https:\/\/steamcommunity.com\/market\/listings\//
-            ) > -1
-        ) {
-            let marketHashName = item_steam_url.split("/")[6]
+        if (!isAddingItem) {
+            setIsAddingItem(true)
+            let item_steam_url = document.querySelector("#steam_url_input")
+                .value
+            if (
+                item_steam_url.search(
+                    /https:\/\/steamcommunity.com\/market\/listings\//
+                ) > -1
+            ) {
+                let marketHashName = item_steam_url.split("/")[6]
 
-            let currency = 34 //AR$
-
-            fetch(item_steam_url)
-                .then((res) => res.text())
-                .then((data) => {
-                    let id = ""
-                    for (let i = 0; i <= 20; i++) {
-                        let charPos =
-                            data.search("Market_LoadOrderSpread") + 24 + i
-                        let char = data[charPos]
-                        if (char !== " ") {
-                            id += char
-                        } else {
-                            break
-                        }
-                    }
-                    return id
-                })
-                .then((itemId) => {
-                    fetch(
-                        `https://steamcommunity.com/market/itemordershistogram?country=AR&language=latam&currency=${currency}&item_nameid=${itemId}`
-                    )
-                        .then((response) => response.json())
-                        .then((newItem) => {
-                            setItems([
-                                ...items,
-                                {
-                                    name: decodeURI(marketHashName),
-                                    id: itemId,
-                                    url: item_steam_url,
-                                    steamPage: item_steam_url,
-                                    sellPrice:
-                                        newItem.lowest_sell_order.substring(
-                                            0,
-                                            newItem.lowest_sell_order.length - 2
-                                        ) +
-                                        "," +
-                                        newItem.lowest_sell_order.substring(
-                                            newItem.lowest_sell_order.length -
-                                                2,
-                                            newItem.lowest_sell_order.length
-                                        ),
-                                    buyPrice:
-                                        newItem.highest_buy_order.substring(
-                                            0,
-                                            newItem.highest_buy_order.length - 2
-                                        ) +
-                                        "," +
-                                        newItem.highest_buy_order.substring(
-                                            newItem.highest_buy_order.length -
-                                                2,
-                                            newItem.highest_buy_order.length
-                                        ),
-                                },
-                            ])
-                            if (localStorage.getItem("itemsUrl")) {
-                                localStorage.setItem(
-                                    "itemsUrl",
-                                    JSON.stringify([
-                                        ...JSON.parse(
-                                            localStorage.getItem("itemsUrl")
-                                        ),
-                                        {
-                                            id: itemId,
-                                            name: decodeURI(marketHashName),
-                                            url: `https://steamcommunity.com/market/itemordershistogram?country=AR&language=latam&currency=${currency}&item_nameid=${itemId}`,
-                                            steamPage: item_steam_url,
-                                        },
-                                    ])
-                                )
-                            } else {
-                                localStorage.setItem(
-                                    "itemsUrl",
-                                    JSON.stringify([
-                                        {
-                                            itemId: itemId,
-                                            name: decodeURI(marketHashName),
-                                            url: `https://steamcommunity.com/market/itemordershistogram?country=AR&language=latam&currency=${currency}&item_nameid=${itemId}`,
-                                            steamPage: item_steam_url,
-                                        },
-                                    ])
-                                )
-                            }
-                        })
-                })
+                fetch(`api/getItemId?steam_url=${item_steam_url}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        return data.id
+                    })
+                    .then((itemId) => {
+                        fetch(`api/getItemPrices?item_id=${itemId}`)
+                            .then((response) => response.json())
+                            .then((itemPrices) => {
+                                setItems([
+                                    ...items,
+                                    {
+                                        name: decodeURI(marketHashName),
+                                        id: itemId,
+                                        steamPage: item_steam_url,
+                                        sellPrice: itemPrices.sellPrice,
+                                        buyPrice: itemPrices.buyPrice,
+                                    },
+                                ])
+                                if (localStorage.getItem("storedItems")) {
+                                    localStorage.setItem(
+                                        "storedItems",
+                                        JSON.stringify([
+                                            ...JSON.parse(
+                                                localStorage.getItem(
+                                                    "storedItems"
+                                                )
+                                            ),
+                                            {
+                                                name: decodeURI(marketHashName),
+                                                id: itemId,
+                                                steamPage: item_steam_url,
+                                            },
+                                        ])
+                                    )
+                                } else {
+                                    localStorage.setItem(
+                                        "storedItems",
+                                        JSON.stringify([
+                                            {
+                                                name: decodeURI(marketHashName),
+                                                id: itemId,
+                                                steamPage: item_steam_url,
+                                            },
+                                        ])
+                                    )
+                                }
+                            })
+                    })
+                    .then(() => setIsAddingItem(false))
+            }
         }
     }
 

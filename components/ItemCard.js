@@ -33,9 +33,20 @@ const ItemCard = ({ item, idNum }) => {
                     let localItemsList = [...items]
                     localItemsList.splice(idNum, 1)
                     setItems(localItemsList)
+
+                    let localStoredItems = []
+
+                    localItemsList.forEach((item) => {
+                        let { name, id, steamPage } = item
+
+                        localStoredItems = [
+                            ...localStoredItems,
+                            { name, id, steamPage },
+                        ]
+                    })
                     localStorage.setItem(
-                        "itemsUrl",
-                        JSON.stringify(localItemsList)
+                        "storedItems",
+                        JSON.stringify(localStoredItems)
                     )
                 }}
             >
